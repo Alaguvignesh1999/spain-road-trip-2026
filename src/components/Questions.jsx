@@ -71,11 +71,11 @@ export default function Questions() {
         </div>
         <div className="q-header-title">
           The 36 Questions<br />
-          <em style={{ fontStyle: 'italic', color: '#F4C0D0', fontSize: '85%' }}>
-            that make two people fall in love
+          <em style={{ fontStyle: 'italic', color: '#C8B8F0', fontSize: '82%' }}>
+            ask each other. be honest. go deep.
           </em>
         </div>
-        <div className="q-header-sub">✨ ask each other · answer honestly ✨</div>
+        <div className="q-header-sub">✦ one question at a time ✦</div>
 
         {/* Global progress bar */}
         <div style={{
@@ -233,18 +233,18 @@ export default function Questions() {
           borderRadius: 20, padding: '20px 20px',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '2rem', marginBottom: 8 }}>🌹</div>
+          <div style={{ fontSize: '2rem', marginBottom: 8 }}>✦</div>
           <div style={{
             fontFamily: 'var(--font-serif)', fontSize: '1.2rem',
             fontWeight: 600, color: 'var(--ink)', marginBottom: 6,
           }}>
-            All 36 questions complete
+            All 36 questions complete ✦
           </div>
           <div style={{
             fontFamily: 'var(--font-hand)', fontSize: '1rem',
             color: 'var(--muted)', lineHeight: 1.6,
           }}>
-            According to Dr. Arthur Aron's research, sharing these questions creates a feeling of closeness — and the people who did it in his lab fell in love. ♡
+            Based on Dr. Arthur Aron's research at SUNY Stony Brook — these questions create genuine closeness between two people. You made it through all 36.
           </div>
         </div>
       )}

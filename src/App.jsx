@@ -2,40 +2,55 @@ import { useState, useEffect, useRef } from 'react'
 import TaigoSVG      from './components/TaigoSVG.jsx'
 import RouteAnimation from './components/RouteAnimation.jsx'
 import Questions      from './components/Questions.jsx'
+import Games          from './components/Games.jsx'
 import {
   STOPS, DAYS, BOOKINGS, PHRASES, TIPS, WEATHER_LOCS,
 } from './data/trip.js'
 
-// ── WMO weather code → emoji + label ──────────────────────────────
+// ── WMO code → icon + label ───────────────────────────────────────
 function wmoLabel(code) {
-  if (code === 0)           return { icon: '☀️', label: 'Sunny' }
-  if (code <= 3)            return { icon: '⛅', label: 'Partly cloudy' }
-  if (code <= 48)           return { icon: '🌫️', label: 'Foggy' }
-  if (code <= 55)           return { icon: '🌦️', label: 'Drizzle' }
-  if (code <= 65)           return { icon: '🌧️', label: 'Rain' }
-  if (code <= 75)           return { icon: '❄️', label: 'Snow' }
-  if (code <= 82)           return { icon: '🌦️', label: 'Showers' }
-  if (code <= 99)           return { icon: '⛈️', label: 'Storm' }
+  if (code === 0)  return { icon: '☀️',  label: 'Sunny' }
+  if (code <= 3)   return { icon: '⛅',  label: 'Partly cloudy' }
+  if (code <= 48)  return { icon: '🌫️', label: 'Foggy' }
+  if (code <= 55)  return { icon: '🌦️', label: 'Drizzle' }
+  if (code <= 65)  return { icon: '🌧️', label: 'Rain' }
+  if (code <= 75)  return { icon: '❄️',  label: 'Snow' }
+  if (code <= 82)  return { icon: '🌦️', label: 'Showers' }
+  if (code <= 99)  return { icon: '⛈️', label: 'Storm' }
   return { icon: '🌤️', label: '' }
 }
 
-// ── Floating petals decoration ────────────────────────────────────
-const PETAL_EMOJIS = ['🌸', '🌺', '✿', '❀', '💮', '🌹']
-function FloatingPetals() {
+// ── Floating items (flags + travel emojis + Deloitte dot) ─────────
+const FLOAT_ITEMS = [
+  { content: '🇸🇬', size: 1.1 },
+  { content: '🇬🇧', size: 1.1 },
+  { content: '✈️',  size: 1.0 },
+  { content: '🚗',  size: 0.9 },
+  { content: '🗺️', size: 1.0 },
+  { content: '🇸🇬', size: 0.85 },
+  { content: '●',   size: 0.7, color: '#86BC24' }, // Deloitte dot
+  { content: '🇬🇧', size: 0.9 },
+  { content: '✈️',  size: 0.85 },
+  { content: '🚗',  size: 1.0 },
+  { content: '●',   size: 0.6, color: '#86BC24' },
+  { content: '🗺️', size: 0.9 },
+]
+function FloatingItems() {
   return (
     <div className="petals-layer" aria-hidden="true">
-      {Array.from({ length: 12 }, (_, i) => (
+      {FLOAT_ITEMS.map((item, i) => (
         <span
           key={i}
           className="petal-piece"
           style={{
-            left:              `${(i * 8.33 + 2) % 100}%`,
-            animationDuration: `${8 + (i * 1.73) % 8}s`,
-            animationDelay:    `${(i * 1.31) % 10}s`,
-            fontSize:          `${0.85 + (i % 3) * 0.28}rem`,
+            left:              `${(i * 8.2 + 3) % 97}%`,
+            animationDuration: `${9 + (i * 1.81) % 9}s`,
+            animationDelay:    `${(i * 1.37) % 12}s`,
+            fontSize:          `${item.size}rem`,
+            color:             item.color ?? undefined,
           }}
         >
-          {PETAL_EMOJIS[i % PETAL_EMOJIS.length]}
+          {item.content}
         </span>
       ))}
     </div>
@@ -44,48 +59,39 @@ function FloatingPetals() {
 
 // ── Splash screen ─────────────────────────────────────────────────
 function Splash({ onEnter }) {
-  const stars = Array.from({ length: 32 }, (_, i) => ({
-    left:  `${(i * 3.1 + 4) % 94}%`,
-    top:   `${(i * 5.9 + 2) % 91}%`,
-    dur:   `${1.4 + (i * 0.37) % 2.2}s`,
-    delay: `${(i * 0.29) % 3.5}s`,
-    size:  `${1.5 + (i % 4) * 0.5}px`,
+  const stars = Array.from({ length: 34 }, (_, i) => ({
+    left:  `${(i * 2.9 + 3) % 95}%`,
+    top:   `${(i * 5.7 + 2) % 92}%`,
+    dur:   `${1.3 + (i * 0.31) % 2.5}s`,
+    delay: `${(i * 0.27) % 4}s`,
+    size:  `${1.5 + (i % 5) * 0.4}px`,
   }))
 
   return (
     <div className="splash">
       <div className="splash-stars" aria-hidden="true">
         {stars.map((s, i) => (
-          <div
-            key={i}
-            className="splash-star"
-            style={{
-              left: s.left, top: s.top,
-              width: s.size, height: s.size,
-              animationDuration: s.dur, animationDelay: s.delay,
-            }}
-          />
+          <div key={i} className="splash-star"
+            style={{ left: s.left, top: s.top, width: s.size, height: s.size,
+              animationDuration: s.dur, animationDelay: s.delay }} />
         ))}
       </div>
 
-      <div className="splash-rose">🌹</div>
-
-      <h1 className="splash-title">
-        <em>España</em> ♡
-      </h1>
-      <div className="splash-sub">two of us · northern spain</div>
+      <div className="splash-cake">🎂</div>
+      <h1 className="splash-title"><em>España</em> ✈</h1>
+      <div className="splash-sub">northern spain road trip</div>
       <div className="splash-date">5 – 8 May 2026</div>
 
       <div className="splash-taigo">
-        <TaigoSVG driver="girl" />
+        <TaigoSVG driver="boy" />
       </div>
 
       <div className="splash-btn">
         <button className="wax-seal" onClick={onEnter} aria-label="Open trip guide">
-          <span className="wax-seal-icon">♡</span>
-          <span className="wax-seal-label">Begin</span>
+          <span className="wax-seal-icon">✦</span>
+          <span className="wax-seal-label">Open</span>
         </button>
-        <div className="splash-hint">tap to open your trip guide</div>
+        <div className="splash-hint">tap to open the guide</div>
       </div>
     </div>
   )
@@ -95,28 +101,25 @@ function Splash({ onEnter }) {
 function useCountdown(isoTarget) {
   const target = useRef(new Date(isoTarget).getTime())
   const [diff, setDiff] = useState(() => Math.max(0, target.current - Date.now()))
-
   useEffect(() => {
     const id = setInterval(() => setDiff(Math.max(0, target.current - Date.now())), 1000)
     return () => clearInterval(id)
   }, [])
-
   return {
-    d:    Math.floor(diff / 86_400_000),
-    h:    Math.floor((diff % 86_400_000) / 3_600_000),
-    m:    Math.floor((diff % 3_600_000) / 60_000),
-    s:    Math.floor((diff % 60_000) / 1_000),
+    d: Math.floor(diff / 86_400_000),
+    h: Math.floor((diff % 86_400_000) / 3_600_000),
+    m: Math.floor((diff % 3_600_000) / 60_000),
+    s: Math.floor((diff % 60_000) / 1_000),
     gone: diff === 0,
   }
 }
 
 // ── HOME SCREEN ───────────────────────────────────────────────────
 function HomeScreen() {
-  // RK2612 departs 5 May 2026 07:00 BST (UTC+1) → 06:00Z
-  const { d, h, m, s, gone } = useCountdown('2026-05-05T06:00:00Z')
+  const { d, h, m, s, gone } = useCountdown('2026-05-05T06:00:00Z') // RK2612 07:00 BST
 
-  const [weather, setWeather]   = useState(null)
-  const [wxError, setWxError]   = useState(false)
+  const [weather, setWeather] = useState(null)
+  const [wxError, setWxError] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -152,19 +155,17 @@ function HomeScreen() {
 
   return (
     <div className="screen">
-      {/* ── Hero ── */}
       <div className="home-hero">
-        <div className="home-hero-hand">a love letter to the north</div>
-        <div className="home-hero-title"><em>España</em> ♡</div>
+        <div className="home-hero-hand">road trip · northern spain</div>
+        <div className="home-hero-title"><em>España</em> ✈</div>
         <div className="home-hero-date">5 – 8 May 2026</div>
       </div>
 
       <div className="screen-body">
-
-        {/* Countdown */}
+        {/* Countdown to Spain flight */}
         <div className="countdown-card">
           <div className="countdown-label">
-            {gone ? '🎉 the adventure is in progress!' : '✈️ RK2612 departs Stansted in…'}
+            {gone ? '🎉 trip in progress!' : '✈️ RK2612 departs Stansted in…'}
           </div>
           {!gone && (
             <div className="countdown-blocks">
@@ -175,46 +176,31 @@ function HomeScreen() {
               <div className="cnt-colon">:</div>
               <div className="cnt-block">
                 <div className="cnt-num">{pad(h)}</div>
-                <div className="cnt-label">hours</div>
+                <div className="cnt-label">hrs</div>
               </div>
               <div className="cnt-colon">:</div>
               <div className="cnt-block">
                 <div className="cnt-num">{pad(m)}</div>
-                <div className="cnt-label">mins</div>
+                <div className="cnt-label">min</div>
               </div>
               <div className="cnt-colon">:</div>
               <div className="cnt-block">
                 <div className="cnt-num">{pad(s)}</div>
-                <div className="cnt-label">secs</div>
+                <div className="cnt-label">sec</div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Singapore flight highlight */}
-        <div className="flight-strip">
-          <span className="flight-strip-icon">✈️</span>
-          <div className="flight-strip-info">
-            <div className="flight-strip-title">SQ314 · Singapore → London Gatwick</div>
-            <div className="flight-strip-detail">
-              Sat 2 May · dep 02:30 Changi T3 · ⚠️ arrives LGW, not LHR!
-            </div>
-          </div>
-          <div className="flight-strip-ref">FJDIDG</div>
-        </div>
-
-        {/* Weather forecast */}
+        {/* Weather */}
         <div>
-          <div style={{
-            fontFamily: 'var(--font-hand)', fontSize: '1.1rem',
-            color: 'var(--rose-mid)', marginBottom: 10,
-          }}>
+          <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.05rem', color: 'var(--teal)', marginBottom: 9 }}>
             🌤️ May forecast
           </div>
           {wxError ? (
-            <div className="weather-loading">couldn't load forecast — check back online 🌦️</div>
+            <div className="weather-loading">couldn't load forecast — check back online</div>
           ) : !weather ? (
-            <div className="weather-loading">fetching the forecast… ✨</div>
+            <div className="weather-loading">fetching the forecast… ✦</div>
           ) : (
             <div className="weather-strip">
               {weather.map(w => (
@@ -229,72 +215,69 @@ function HomeScreen() {
           )}
         </div>
 
-        {/* Love note */}
-        <div className="love-note">
-          <div className="love-note-text">
-            Four days along the Cantabrian coast — the Game of Thrones island, the world's
-            greatest pintxos, mountains that touch clouds, a medieval village frozen in time.{' '}
-            <em>Just us and the Taigo.</em> ♡
+        {/* Trip note */}
+        <div className="trip-note">
+          <div className="trip-note-text">
+            Four days along the Cantabrian coast — the Game of Thrones island,
+            the world's greatest pintxos, mountains that touch clouds, a medieval
+            village frozen in time. <em>Just us and the Taigo.</em>
           </div>
-          <div className="love-note-sign">— a little adventure for two 🌹</div>
+          <div className="trip-note-sign">— a little road trip ✦</div>
         </div>
 
-        {/* Trip day overview */}
+        {/* Day overview */}
         <div className="card">
           <div className="card-header">
-            <div className="card-label">the adventure</div>
+            <div className="card-label">the plan</div>
             <div className="card-title">4 days · 15 stops · Northern Spain</div>
             <div className="card-note">Basque Country → Cantabria → Picos de Europa → Asturias</div>
           </div>
           <div className="card-body">
-            {DAYS.map(day => (
-              <div
-                key={day.id}
-                style={{
-                  display: 'flex', alignItems: 'flex-start', gap: 10,
-                  padding: '9px 0',
-                  borderBottom: day.id < 4 ? '1px solid var(--border)' : 'none',
-                }}
-              >
-                <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>{day.emoji}</span>
+            {DAYS.map((day, i) => (
+              <div key={day.id} style={{
+                display: 'flex', alignItems: 'flex-start', gap: 10,
+                padding: '8px 0',
+                borderBottom: i < DAYS.length - 1 ? '1px solid var(--border)' : 'none',
+              }}>
+                <span style={{ fontSize: '1.15rem', flexShrink: 0 }}>{day.emoji}</span>
                 <div>
-                  <div style={{
-                    fontSize: '0.7rem', fontWeight: 700,
-                    textTransform: 'uppercase', letterSpacing: '0.08em',
-                    color: day.color,
-                  }}>
+                  <div style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: day.color }}>
                     {day.date}
                   </div>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--ink)', marginTop: 1 }}>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 600, color: 'var(--ink)', marginTop: 1 }}>
                     {day.title}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{day.drive}</div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--muted)' }}>{day.drive}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-
       </div>
     </div>
   )
 }
 
 // ── ROUTE SCREEN ──────────────────────────────────────────────────
-function RouteScreen() {
-  const [current, setCurrent] = useState(0)
-  const stop    = STOPS[current]
-  const dayData = DAYS.find(d => d.id === stop.day)
+function RouteScreen({ currentStop, setCurrentStop }) {
+  const stop     = STOPS[currentStop]
+  const nextStop = currentStop < STOPS.length - 1 ? STOPS[currentStop + 1] : null
+  const dayData  = DAYS.find(d => d.id === stop.day)
 
-  // keyboard arrows
+  const driverLabel = () => {
+    if (stop.driver === 'anyone') return <>🔑 <strong style={{ color: 'var(--teal)' }}>picking up keys!</strong></>
+    if (stop.driver === 'boy')    return <><strong style={{ color: 'var(--teal)' }}>his</strong> turn to drive</>
+    return <><strong style={{ color: 'var(--lilac)' }}>her</strong> turn to drive</>
+  }
+
   useEffect(() => {
-    function onKey(e) {
-      if (e.key === 'ArrowRight' && current < STOPS.length - 1) setCurrent(c => c + 1)
-      if (e.key === 'ArrowLeft'  && current > 0)               setCurrent(c => c - 1)
+    const onKey = e => {
+      if (e.key === 'ArrowRight' && currentStop < STOPS.length - 1) setCurrentStop(c => c + 1)
+      if (e.key === 'ArrowLeft'  && currentStop > 0)                setCurrentStop(c => c - 1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [current])
+  }, [currentStop, setCurrentStop])
 
   return (
     <div className="screen">
@@ -304,50 +287,44 @@ function RouteScreen() {
       </div>
 
       <div className="screen-body">
-
         {/* Animated SVG map */}
-        <div className="route-map-wrap">
-          <RouteAnimation currentStop={current} />
+        <div>
+          <div className="route-svg-container">
+            <RouteAnimation currentStop={currentStop} />
+          </div>
+          {/* Route banner */}
+          <div className="route-banner">
+            <span className="route-banner-stop">{stop.emoji} <strong>{stop.name}</strong></span>
+            {nextStop && (
+              <>
+                <span className="route-banner-arrow">→</span>
+                <span className="route-banner-stop">{nextStop.emoji} {nextStop.name}</span>
+              </>
+            )}
+            {!nextStop && <span style={{ fontFamily: 'var(--font-hand)', color: 'var(--muted)' }}>¡Hasta luego! 🎉</span>}
+          </div>
         </div>
 
         {/* Stop navigation */}
         <div className="stop-nav-bar">
-          <button
-            className="stop-btn"
-            onClick={() => setCurrent(c => c - 1)}
-            disabled={current === 0}
-            aria-label="Previous stop"
-          >
-            ◀
-          </button>
+          <button className="stop-btn" onClick={() => setCurrentStop(c => c - 1)} disabled={currentStop === 0} aria-label="Previous stop">◀</button>
           <div className="stop-nav-center">
-            <div className="stop-counter">Stop {current + 1} of {STOPS.length}</div>
-            <div
-              className="stop-day-pill"
-              style={{ background: dayData?.colorLight, color: dayData?.color }}
-            >
+            <div className="stop-counter">Stop {currentStop + 1} of {STOPS.length}</div>
+            <div className="stop-day-pill" style={{ background: dayData?.colorLight, color: dayData?.color }}>
               {dayData?.date}
             </div>
             <div className="stop-dots">
               {STOPS.map(s => (
-                <button
-                  key={s.id}
-                  className={`stop-dot${s.id === current ? ' active' : s.id < current ? ' visited' : ''}`}
-                  style={s.id === current ? { background: dayData?.color, borderColor: dayData?.color } : {}}
-                  onClick={() => setCurrent(s.id)}
+                <button key={s.id}
+                  className={`stop-dot${s.id === currentStop ? ' active' : s.id < currentStop ? ' visited' : ''}`}
+                  style={s.id === currentStop ? { background: dayData?.color, borderColor: dayData?.color } : {}}
+                  onClick={() => setCurrentStop(s.id)}
                   aria-label={s.name}
                 />
               ))}
             </div>
           </div>
-          <button
-            className="stop-btn"
-            onClick={() => setCurrent(c => c + 1)}
-            disabled={current === STOPS.length - 1}
-            aria-label="Next stop"
-          >
-            ▶
-          </button>
+          <button className="stop-btn" onClick={() => setCurrentStop(c => c + 1)} disabled={currentStop === STOPS.length - 1} aria-label="Next stop">▶</button>
         </div>
 
         {/* Taigo car panel */}
@@ -355,12 +332,7 @@ function RouteScreen() {
           <TaigoSVG driver={stop.driver} />
           <div className="driver-strip">
             <div className={`driver-face${stop.driver === 'girl' ? ' driving' : ''}`}>👩</div>
-            <div className="driver-label-text">
-              {stop.driver === 'girl'
-                ? <><strong>her</strong> turn to drive!</>
-                : <><strong>his</strong> turn to drive!</>
-              }
-            </div>
+            <div className="driver-label-text">{driverLabel()}</div>
             <div className={`driver-face${stop.driver === 'boy' ? ' driving' : ''}`}>👨</div>
           </div>
         </div>
@@ -375,9 +347,7 @@ function RouteScreen() {
           </div>
 
           <div className="stop-detail-body">
-            {stop.detail && (
-              <div className="stop-tip-block">💡 {stop.detail}</div>
-            )}
+            {stop.detail && <div className="stop-tip-block">💡 {stop.detail}</div>}
 
             {stop.food.length > 0 && (
               <div>
@@ -390,12 +360,7 @@ function RouteScreen() {
                         <div className="food-name">{f.name}</div>
                         <div className="food-note">{f.note}</div>
                         {f.maps && (
-                          <a
-                            href={f.maps}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="food-maps-link"
-                          >
+                          <a href={f.maps} target="_blank" rel="noopener noreferrer" className="food-maps-link">
                             📍 open in maps
                           </a>
                         )}
@@ -406,17 +371,19 @@ function RouteScreen() {
               </div>
             )}
 
-            <a
-              href={stop.gmaps}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="maps-btn"
-            >
-              🗺 Start navigation → {stop.name}
+            {/* Navigate to this stop */}
+            <a href={stop.gmaps} target="_blank" rel="noopener noreferrer" className="maps-btn">
+              🗺 Navigate to {stop.name}
             </a>
+
+            {/* Navigate to NEXT stop */}
+            {nextStop && (
+              <a href={nextStop.gmaps} target="_blank" rel="noopener noreferrer" className="maps-btn-next">
+                ▶ Continue → {nextStop.emoji} {nextStop.name}
+              </a>
+            )}
           </div>
         </div>
-
       </div>
     </div>
   )
@@ -424,7 +391,8 @@ function RouteScreen() {
 
 // ── DAYS SCREEN ───────────────────────────────────────────────────
 function DaysScreen() {
-  const [openDay, setOpenDay] = useState(1)
+  const [openDay, setOpenDay]       = useState(1)
+  const [pintxosMode, setPintxos]   = useState('crawl') // 'crawl' | 'dinner'
 
   return (
     <div className="screen">
@@ -437,26 +405,24 @@ function DaysScreen() {
         <div className="day-cards-list">
           {DAYS.map(day => {
             const isOpen = openDay === day.id
+            // Build full-day Google Maps route URL
+            const dayStops = day.stopIds.map(id => STOPS[id])
+            const mapsRoute = 'https://www.google.com/maps/dir/' +
+              dayStops.map(s => encodeURIComponent(s.name + ', Spain')).join('/')
+
             return (
               <div key={day.id} className={`day-big-card${isOpen ? ' open' : ''}`}>
-                <div
-                  className="day-card-top"
+                <div className="day-card-top"
                   onClick={() => setOpenDay(isOpen ? null : day.id)}
-                  role="button"
-                  aria-expanded={isOpen}
+                  role="button" aria-expanded={isOpen}
                 >
-                  <div
-                    className="day-card-accent-bar"
-                    style={{ background: day.color }}
-                  />
+                  <div className="day-card-accent-bar" style={{ background: day.color }} />
                   <div className="day-card-top-text">
                     <div className="day-card-day" style={{ color: day.color }}>
                       {day.emoji} {day.date} · {day.region}
                     </div>
                     <div className="day-card-title-big">{day.title}</div>
-                    <div className="day-card-sub-text">
-                      {day.subtitle} · {day.drive}
-                    </div>
+                    <div className="day-card-sub-text">{day.subtitle} · {day.drive}</div>
                   </div>
                   <span className="day-card-chevron" aria-hidden="true">▼</span>
                 </div>
@@ -464,17 +430,26 @@ function DaysScreen() {
                 <div className="day-card-body-wrap">
                   <div className="day-card-inner">
 
-                    {/* Stop list */}
-                    <div style={{ marginTop: 14 }}>
+                    {/* Open full day in Google Maps */}
+                    <a href={mapsRoute} target="_blank" rel="noopener noreferrer"
+                      className="day-route-btn" style={{ marginTop: 14 }}>
+                      🗺 Open full day route in Maps
+                    </a>
+
+                    {/* Stops */}
+                    <div style={{ marginTop: 10 }}>
                       {day.stopIds.map(id => {
                         const s = STOPS[id]
                         return (
                           <div key={id} className="day-stop-row">
                             <span className="day-stop-emoji">{s.emoji}</span>
-                            <div>
+                            <div style={{ flex: 1 }}>
                               <div className="day-stop-name">{s.name}</div>
                               <div className="day-stop-desc">{s.desc}</div>
                             </div>
+                            <a href={s.gmaps} target="_blank" rel="noopener noreferrer"
+                              style={{ fontSize: '1.1rem', flexShrink: 0, opacity: 0.6, paddingTop: 2 }}
+                              title="Directions">📍</a>
                           </div>
                         )
                       })}
@@ -483,9 +458,7 @@ function DaysScreen() {
                     {/* Hotel badge */}
                     {day.hotel && (
                       <div className="day-hotel-badge">
-                        <span className="day-hotel-icon">
-                          {day.id === 4 ? '✈️' : '🏨'}
-                        </span>
+                        <span className="day-hotel-icon">{day.id === 4 ? '✈️' : '🏨'}</span>
                         <div>
                           <div className="day-hotel-name">{day.hotel.name}</div>
                           <div className="day-hotel-area">{day.hotel.area}</div>
@@ -494,38 +467,66 @@ function DaysScreen() {
                               Check-in {day.hotel.checkin} · Checkout {day.hotel.checkout}
                             </div>
                           )}
-                          {day.hotel.note && (
-                            <div className="day-hotel-note">{day.hotel.note}</div>
-                          )}
+                          {day.hotel.note && <div className="day-hotel-note">{day.hotel.note}</div>}
                         </div>
                       </div>
                     )}
 
-                    {/* Pintxos timeline — Day 1 only */}
-                    {day.pintxos && day.pintxos.length > 0 && (
+                    {/* Day 1 evening plan — pintxos crawl or dinner */}
+                    {day.id === 1 && day.pintxos && day.pintxos.length > 0 && (
                       <div className="pintxos-block">
-                        <div className="pintxos-title">🍢 pintxos crawl plan</div>
-                        {day.pintxos.map((p, i) => (
-                          <div key={i} className="pintxos-item">
-                            <div className="pintxos-time">{p.time}</div>
-                            <div style={{ flex: 1 }}>
-                              <div className="pintxos-bar">{p.bar}</div>
-                              <div className="pintxos-order">{p.order}</div>
-                            </div>
-                            <span className="pintxos-icon">{p.icon}</span>
-                          </div>
-                        ))}
-                        <div style={{
-                          marginTop: 12,
-                          background: 'var(--petal)',
-                          border: '1px solid var(--border)',
-                          borderRadius: 12, padding: '10px 14px',
-                          fontFamily: 'var(--font-hand)', fontSize: '0.95rem',
-                          color: 'var(--muted)', lineHeight: 1.6,
-                        }}>
-                          💡 Pay at each bar as you go · Budget ~€25–35pp all in ·
-                          Txakoli wine at each stop · Never sit at Plaza de la Constitución bars
+                        <div className="pintxos-mode-toggle">
+                          <button
+                            className={`pintxos-mode-btn${pintxosMode === 'crawl' ? ' active' : ''}`}
+                            onClick={() => setPintxos('crawl')}
+                          >
+                            🍢 Pintxos Crawl
+                          </button>
+                          <button
+                            className={`pintxos-mode-btn${pintxosMode === 'dinner' ? ' active' : ''}`}
+                            onClick={() => setPintxos('dinner')}
+                          >
+                            🍽️ Sit-Down Dinner
+                          </button>
                         </div>
+
+                        {pintxosMode === 'crawl' ? (
+                          <>
+                            <div className="pintxos-title">🍢 pintxos crawl plan</div>
+                            {day.pintxos.map((p, i) => (
+                              <div key={i} className="pintxos-item">
+                                <div className="pintxos-time">{p.time}</div>
+                                <div style={{ flex: 1 }}>
+                                  <div className="pintxos-bar">{p.bar}</div>
+                                  <div className="pintxos-order">{p.order}</div>
+                                </div>
+                                <span className="pintxos-icon">{p.icon}</span>
+                              </div>
+                            ))}
+                            <div className="pintxos-note">
+                              💡 Pay at each bar as you go · ~€25–35pp all in ·
+                              Txakoli at each stop · Avoid Plaza de la Constitución bars
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="pintxos-title">🍽️ dinner options</div>
+                            {day.dinnerAlt.map((r, i) => (
+                              <div key={i} className="food-item" style={{ marginBottom: 6 }}>
+                                <span className="food-icon">{r.icon}</span>
+                                <div className="food-text">
+                                  <div className="food-name">{r.name}</div>
+                                  <div className="food-note">{r.note}</div>
+                                  {r.maps && (
+                                    <a href={r.maps} target="_blank" rel="noopener noreferrer" className="food-maps-link">
+                                      📍 open in maps
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        )}
                       </div>
                     )}
 
@@ -552,7 +553,7 @@ function InfoScreen() {
       {/* Bookings */}
       <div className="info-section">
         <div className="info-section-title">✈️ bookings &amp; refs</div>
-        <div className="screen-body" style={{ paddingTop: 0, gap: 10 }}>
+        <div className="screen-body" style={{ paddingTop: 0, gap: 9 }}>
           {BOOKINGS.map(b => (
             <div key={b.id} className={`booking-card${b.urgent ? ' urgent' : ''}`}>
               <span className="booking-icon">{b.icon}</span>
@@ -577,9 +578,7 @@ function InfoScreen() {
           <div className="tips-grid">
             {TIPS.map((t, i) => (
               <div key={i} className={`tip-chip ${t.urgency}`}>
-                {t.urgency === 'critical' && (
-                  <div className="tip-critical-badge">must do</div>
-                )}
+                {t.urgency === 'critical' && <div className="tip-critical-badge">must do</div>}
                 <div className="tip-chip-icon">{t.icon}</div>
                 <div className="tip-chip-title">{t.title}</div>
                 <div className="tip-chip-text">{t.text}</div>
@@ -589,10 +588,10 @@ function InfoScreen() {
         </div>
       </div>
 
-      {/* Spanish phrases */}
-      <div className="info-section" style={{ paddingBottom: 24 }}>
+      {/* Phrases */}
+      <div className="info-section" style={{ paddingBottom: 32 }}>
         <div className="info-section-title">🗣️ spanish phrases</div>
-        <div className="screen-body" style={{ paddingTop: 0, gap: 8 }}>
+        <div className="screen-body" style={{ paddingTop: 0, gap: 7 }}>
           {PHRASES.map((p, i) => (
             <div key={i} className="phrase-card">
               <div className="phrase-es">{p.es}</div>
@@ -608,79 +607,83 @@ function InfoScreen() {
 
 // ── Tab config ────────────────────────────────────────────────────
 const TABS = [
-  { id: 'home',  icon: '🏠', label: 'Home'  },
-  { id: 'route', icon: '🗺️', label: 'Route' },
-  { id: 'days',  icon: '📅', label: 'Days'  },
-  { id: 'love',  icon: '♡',  label: 'Love'  },
-  { id: 'info',  icon: '📋', label: 'Info'  },
+  { id: 'home',   icon: '🏠',  label: 'Home'   },
+  { id: 'route',  icon: '🗺️', label: 'Route'  },
+  { id: 'days',   icon: '📅',  label: 'Days'   },
+  { id: 'qs',     icon: '✦',   label: '36 Qs'  },
+  { id: 'info',   icon: '📋',  label: 'Info'   },
+  { id: 'games',  icon: '🎮',  label: 'Games'  },
 ]
 
 // ── Root App ──────────────────────────────────────────────────────
 export default function App() {
-  const [splash, setSplash]       = useState(true)
-  const [activeTab, setActiveTab] = useState('home')
+  const [splash,      setSplash]      = useState(true)
+  const [activeTab,   setActiveTab]   = useState('home')
+  // Lifted state for persistence across tab switches
+  const [currentStop, setCurrentStop] = useState(0)
 
   return (
     <div className="app">
-      <FloatingPetals />
+      <FloatingItems />
 
       {splash && <Splash onEnter={() => setSplash(false)} />}
 
       {!splash && (
-        <div className="app-desktop-layout">
+        <>
+          <div className="app-desktop-layout">
+            {/* Desktop sidebar */}
+            <aside className="desktop-sidebar">
+              <div className="desktop-logo">España ✈</div>
+              {TABS.map(tab => (
+                <button
+                  key={tab.id}
+                  className={`desktop-nav-item${activeTab === tab.id ? ' active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <span className="desktop-nav-icon">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              ))}
+              <div style={{
+                marginTop: 'auto', paddingTop: 20,
+                fontFamily: 'var(--font-hand)', fontSize: '0.8rem',
+                color: 'var(--muted)', lineHeight: 1.65,
+              }}>
+                🇸🇬 → 🇬🇧 → 🇪🇸<br />
+                5–8 May 2026
+              </div>
+            </aside>
 
-          {/* ── Desktop sidebar (hidden on mobile) ── */}
-          <aside className="desktop-sidebar">
-            <div className="desktop-logo">España ♡</div>
+            {/* Main content — all screens always mounted for state persistence */}
+            <main className="desktop-main">
+              <div className="app-inner">
+                <div className={`screen-pane${activeTab === 'home'  ? ' active' : ''}`}><HomeScreen /></div>
+                <div className={`screen-pane${activeTab === 'route' ? ' active' : ''}`}>
+                  <RouteScreen currentStop={currentStop} setCurrentStop={setCurrentStop} />
+                </div>
+                <div className={`screen-pane${activeTab === 'days'  ? ' active' : ''}`}><DaysScreen /></div>
+                <div className={`screen-pane${activeTab === 'qs'    ? ' active' : ''}`}><Questions /></div>
+                <div className={`screen-pane${activeTab === 'info'  ? ' active' : ''}`}><InfoScreen /></div>
+                <div className={`screen-pane${activeTab === 'games' ? ' active' : ''}`}><Games /></div>
+              </div>
+            </main>
+          </div>
+
+          {/* Mobile bottom nav */}
+          <nav className="bottom-nav" aria-label="Main navigation">
             {TABS.map(tab => (
               <button
                 key={tab.id}
-                className={`desktop-nav-item${activeTab === tab.id ? ' active' : ''}`}
+                className={`nav-tab${activeTab === tab.id ? ' active' : ''}`}
                 onClick={() => setActiveTab(tab.id)}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
               >
-                <span className="desktop-nav-icon">{tab.icon}</span>
-                {tab.label}
+                <span className="nav-tab-icon" aria-hidden="true">{tab.icon}</span>
+                <span className="nav-tab-label">{tab.label}</span>
               </button>
             ))}
-            <div style={{
-              marginTop: 'auto', paddingTop: 24,
-              fontFamily: 'var(--font-hand)', fontSize: '0.82rem',
-              color: 'var(--muted)', lineHeight: 1.6,
-            }}>
-              🌹 5–8 May 2026<br />
-              Northern Spain
-            </div>
-          </aside>
-
-          {/* ── Main content ── */}
-          <main className="desktop-main">
-            <div className="tab-view fade-in" key={activeTab}>
-              {activeTab === 'home'  && <HomeScreen />}
-              {activeTab === 'route' && <RouteScreen />}
-              {activeTab === 'days'  && <DaysScreen />}
-              {activeTab === 'love'  && <Questions />}
-              {activeTab === 'info'  && <InfoScreen />}
-            </div>
-          </main>
-
-        </div>
-      )}
-
-      {/* ── Mobile bottom nav ── */}
-      {!splash && (
-        <nav className="bottom-nav" aria-label="Main navigation">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              className={`nav-tab${activeTab === tab.id ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-              aria-current={activeTab === tab.id ? 'page' : undefined}
-            >
-              <span className="nav-tab-icon" aria-hidden="true">{tab.icon}</span>
-              <span className="nav-tab-label">{tab.label}</span>
-            </button>
-          ))}
-        </nav>
+          </nav>
+        </>
       )}
     </div>
   )

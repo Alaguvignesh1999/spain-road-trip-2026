@@ -1,7 +1,7 @@
 // ─── Stops (15 total, driver alternates) ───────────────────────
 export const STOPS = [
   {
-    id: 0, day: 1, driver: 'girl',
+    id: 0, day: 1, driver: 'anyone',
     name: 'Santander Airport', emoji: '✈️', region: 'Cantabria',
     coords: [43.4271, -3.8209], svgX: 173, svgY: 69,
     desc: 'Wheels down. Keys from Avis. The Taigo awaits — road trip starts NOW.',
@@ -33,6 +33,7 @@ export const STOPS = [
       { name: 'Ganbara', note: 'Mushroom & foie pintxos — arrive at 19:00 or they sell out', icon: '🍄', maps: 'https://www.google.com/maps/search/Ganbara+San+Sebastian' },
       { name: 'Borda Berri', note: 'Hot pintxos made to order — foie, txistorra', icon: '🔥', maps: 'https://www.google.com/maps/search/Borda+Berri+San+Sebastian' },
       { name: 'La Viña', note: 'The original burnt Basque cheesecake — end every evening here', icon: '🍮', maps: 'https://www.google.com/maps/search/La+Vina+San+Sebastian' },
+      { name: 'Xiu', note: 'Asian-Basque fusion in Gros — excellent if you want a break from pintxos', icon: '🥢', maps: 'https://maps.app.goo.gl/ztrjMn9jgCZLPZwe6' },
     ],
   },
   {
@@ -181,6 +182,11 @@ export const DAYS = [
     drive: '~2.5h driving',
     stopIds: [0, 1, 2],
     hotel: { name: 'Talo Urban Rooms', area: 'San Sebastián · Gros', checkin: '15:00', checkout: '12:00' },
+    dinnerAlt: [
+      { name: 'Narru', note: 'Modern Basque tasting menu — full sit-down dinner, reserve ahead', icon: '🍽️', maps: 'https://www.google.com/maps/search/Narru+San+Sebastian' },
+      { name: 'Kokotxa', note: 'Classic Basque fish & rice, intimate & quiet, no bar-hopping needed', icon: '🐟', maps: 'https://www.google.com/maps/search/Restaurante+Kokotxa+San+Sebastian' },
+      { name: 'Xiu', note: 'Asian-Basque fusion in Gros — great if you want something different', icon: '🥢', maps: 'https://maps.app.goo.gl/ztrjMn9jgCZLPZwe6' },
+    ],
     pintxos: [
       { time: '18:50', bar: 'Bar Nestor', order: 'Put your name on the 20:00 tortilla list NOW', icon: '📝' },
       { time: '19:00', bar: 'Ganbara', order: 'Mushroom & foie pintxos — arrive early, they sell out', icon: '🍄' },
@@ -194,7 +200,7 @@ export const DAYS = [
     id: 2, date: 'Wed 6 May', emoji: '🎨',
     color: '#3D6B55', colorLight: '#D4EAD8',
     region: 'Basque Country → Cantabria',
-    title: 'San Sebastián → Zumaia → Bilbao → Santander',
+    title: 'San Sebastián → Zumaia → Bilbao → Sancibrián',
     subtitle: 'Geological Wonder, Titanium Architecture & Rabas',
     drive: '~3.5h driving',
     stopIds: [3, 4, 5, 6],
@@ -235,24 +241,6 @@ export const SVG_ROUTES = {
 
 // ─── All bookings ───────────────────────────────────────────────
 export const BOOKINGS = [
-  {
-    id: 'sg-out', category: 'flight', icon: '✈️',
-    title: 'Singapore → London Gatwick',
-    ref: 'FJDIDG',
-    line1: 'SQ314 · Changi T3 → LGW Terminal N',
-    line2: 'Sat 2 May · dep 02:30 · arr 09:30 · 14h · A350-900',
-    alert: '⚠️ Arrives Gatwick (LGW) — NOT Heathrow!',
-    urgent: false,
-  },
-  {
-    id: 'sg-return', category: 'flight', icon: '✈️',
-    title: 'London Heathrow → Singapore',
-    ref: 'FJDIDG',
-    line1: 'SQ317 · LHR T2 → Changi',
-    line2: 'Sun 10 May · dep 11:20 · arr Mon 11 May 07:30 · A380-800',
-    alert: '⚠️ Departs Heathrow (LHR) — NOT Gatwick!',
-    urgent: false,
-  },
   {
     id: 'spain-out', category: 'flight', icon: '🛫',
     title: 'London Stansted → Santander',
