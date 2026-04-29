@@ -1,4 +1,4 @@
-// ─── Stops (15 total, driver alternates) ───────────────────────
+﻿// ─── Stops (15 total, driver alternates) ───────────────────────
 export const STOPS = [
   {
     id: 0, day: 1, driver: 'anyone',
@@ -239,6 +239,15 @@ export const SVG_ROUTES = {
   4: { color: '#C87A2A', d: 'M 41,77 Q 84,72 128,79 Q 137,77 146,77 Q 160,70 173,69' },
 }
 
+// Route coordinates for Leaflet map fallback component.
+export const ROUTES = DAYS.reduce((acc, day) => {
+  acc[day.id] = {
+    color: day.color,
+    coords: day.stopIds.map(stopId => STOPS[stopId].coords),
+  }
+  return acc
+}, {})
+
 // ─── All bookings ───────────────────────────────────────────────
 export const BOOKINGS = [
   {
@@ -401,3 +410,4 @@ export const WEATHER_LOCS = [
   { day: 3, name: 'Picos de Europa', lat: 43.2506, lon: -4.8051, date: '2026-05-07' },
   { day: 4, name: 'Santander',       lat: 43.4623, lon: -3.8099, date: '2026-05-08' },
 ]
+
